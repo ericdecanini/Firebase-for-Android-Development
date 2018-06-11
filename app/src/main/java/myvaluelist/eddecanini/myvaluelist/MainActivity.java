@@ -19,7 +19,6 @@ import com.firebase.ui.auth.AuthUI;
 import com.github.aakira.expandablelayout.ExpandableLinearLayout;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -39,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity
-    implements TodoAdapter.onImageClickedListener {
+        implements TodoAdapter.onImageClickedListener {
 
     String LOG_TAG = MainActivity.class.getSimpleName();
 
@@ -48,8 +47,6 @@ public class MainActivity extends AppCompatActivity
 
     FirebaseFirestore db;
     FirebaseStorage storage;
-    FirebaseAnalytics analytics;
-
     String uid;
     List<AuthUI.IdpConfig> providers = Arrays.asList(
             new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build()
@@ -108,8 +105,6 @@ public class MainActivity extends AppCompatActivity
         Map<String, Object> userMap = new HashMap<>();
         userMap.put("todoList", todoItems);
         db.collection("users").document(uid).set(userMap);
-
-        logAddItemEvent(newItem);
     }
 
     private void initList() {
@@ -130,8 +125,6 @@ public class MainActivity extends AppCompatActivity
     private void initFirebase() {
         db = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance();
-        analytics = FirebaseAnalytics.getInstance(this);
-
         uid = FirebaseAuth.getInstance().getUid();
         Log.v(LOG_TAG, "Uid: " + uid);
 
@@ -147,12 +140,6 @@ public class MainActivity extends AppCompatActivity
 
 
         addListListener();
-    }
-
-    private void logAddItemEvent(String itemName) {
-        Bundle logBundle = new Bundle();
-        logBundle.putString(FirebaseAnalytics.Param.ITEM_NAME, itemName);
-        analytics.logEvent("AddItem", logBundle);
     }
 
     @Override
