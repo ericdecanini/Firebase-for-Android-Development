@@ -3,7 +3,9 @@ package myvaluelist.eddecanini.myvaluelist;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -110,14 +112,26 @@ public class TodoAdapter extends ArrayAdapter<String> {
             Map<String, Object> userMap = new HashMap<>();
             userMap.put("todoList", this.objects);
             db.collection("users").document(uid).set(userMap);
-
-            setDeletedItemProperty();
+            addValuePoints();
         });
     }
 
-    private void setDeletedItemProperty() {
+    private void addValuePoints() {
+        // Add points
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        int valuePoints = preferences.getInt("value_points", 0);
+        valuePoints += 10;
+
+        preferences.edit()
+                .putInt("value_points", valuePoints)
+                .apply();
+
+        // Check if user property should be set
         FirebaseAnalytics analytics = FirebaseAnalytics.getInstance(getContext());
-        analytics.setUserProperty("item_deleted", "true");
+        if (valuePoints >= 100 && valuePoints < 200)
+            analytics.setUserProperty("reward_level", "1");
+        else if (valuePoints >= 200)
+            analytics.setUserProperty("reward_level", "2");
     }
 
 }

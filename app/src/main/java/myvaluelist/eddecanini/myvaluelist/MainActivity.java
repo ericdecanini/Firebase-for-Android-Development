@@ -18,9 +18,13 @@ import com.beardedhen.androidbootstrap.BootstrapButton;
 import com.firebase.ui.auth.AuthUI;
 import com.github.aakira.expandablelayout.ExpandableLinearLayout;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -48,6 +52,7 @@ public class MainActivity extends AppCompatActivity
     FirebaseFirestore db;
     FirebaseStorage storage;
     String uid;
+
     List<AuthUI.IdpConfig> providers = Arrays.asList(
             new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build()
     );
@@ -125,6 +130,7 @@ public class MainActivity extends AppCompatActivity
     private void initFirebase() {
         db = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance();
+
         uid = FirebaseAuth.getInstance().getUid();
         Log.v(LOG_TAG, "Uid: " + uid);
 
