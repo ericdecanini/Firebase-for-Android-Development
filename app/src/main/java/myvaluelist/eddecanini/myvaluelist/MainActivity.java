@@ -22,7 +22,12 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.google.firebase.storage.FirebaseStorage;
@@ -120,7 +125,11 @@ public class MainActivity extends AppCompatActivity
     private void addListListener() {
         // Downloads and updates to-do list
         db.collection("users").document(uid).addSnapshotListener((documentSnapshot, e) -> {
+            if (!documentSnapshot.exists())
+                return;
             ArrayList<String> newTodoItems = (ArrayList<String>) documentSnapshot.get("todoList");
+            if (newTodoItems == null)
+                return;
             todoItems.clear();
             todoItems.addAll(newTodoItems);
             todoAdapter.notifyDataSetChanged();
@@ -156,6 +165,19 @@ public class MainActivity extends AppCompatActivity
         if (requestCode == RC_SIGN_IN && resultCode == RESULT_OK) {
             uid = FirebaseAuth.getInstance().getUid();
             initFirebase();
+
+            String token = FirebaseInstanceId.getInstance().getToken();
+            DocumentReference userRef = db.collection("users").document(uid);
+            userRef.addSnapshotListener((documentSnapshot, e) -> {
+                if (documentSnapshot.exists()) {
+                    userRef.update("messagingToken", token);
+                } else {
+                    Map<String, Object> userMap = new HashMap<>();
+                    userMap.put("messagingToken", token);
+                    userRef.set(userMap);
+                }
+            });
+
         }
 
         if (requestCode == RC_PICK_IMAGE && resultCode == RESULT_OK) {
