@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 
 import com.beardedhen.androidbootstrap.BootstrapButton;
+import com.crashlytics.android.Crashlytics;
 import com.firebase.ui.auth.AuthUI;
 import com.github.aakira.expandablelayout.ExpandableLinearLayout;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -155,6 +156,13 @@ public class MainActivity extends AppCompatActivity
 
 
         addListListener();
+        prepareCrashReport();
+    }
+
+    private void prepareCrashReport() {
+        Crashlytics.log("Error Report");
+        Crashlytics.setInt("listSize", todoItems.size());
+        Crashlytics.setUserIdentifier(uid);
     }
 
     @Override
